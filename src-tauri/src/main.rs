@@ -19,6 +19,29 @@ fn main() {
 
             let app_handle = app.app_handle();
 
+            // Resolve paths to Python and server.py
+            let python_path = app_handle
+                .path()
+                .resolve(
+                    "resources/python/bin/python3",
+                    tauri::path::BaseDirectory::Resource,
+                )
+                .expect("failed to resolve python path");
+
+            let server_path = app_handle
+                .path()
+                .resolve("resources/server.py", tauri::path::BaseDirectory::Resource)
+                .expect("failed to resolve server path");
+
+            println!("Python path: {:?}", python_path);
+            println!("Server path: {:?}", server_path);
+
+            // Spawn Python server
+            std::process::Command::new(python_path)
+                .arg(server_path)
+                .spawn()
+                .expect("failed to spawn python server");
+
             tray::create(app_handle)?;
 
             Ok(())
